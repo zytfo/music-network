@@ -388,6 +388,57 @@ app.post('/review', (req, res) => {
     }
 });
 
+app.get('/best-review', (req, res) => {
+    if(!flag) {
+        pool.query(`SELECT DISTINCT ${'playlist.id'}, ${'playlist.name'} , ${'review.rating'}
+        FROM ${'playlist'} INNER JOIN ${'review'} ON playlist.id = review.playlistId ORDER BY ${'review.rating'} DESC`, (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(400).send({ error: "Something went wrong"});
+            } else {
+                console.log(results);
+                return res.send(results);
+            }
+        })
+    } else {
+
+        const pipeline = [
+            {
+                "$lookup": {
+                    "from": "review",
+                    "localField": "id",
+                    "foreignField": "playlistId",
+                    "as": "r"
+                }
+            },
+            {
+                "$unwind": "$r"
+            },
+            {
+                "$group": {
+                    "_id": {"playlistId": "$r.playlistId"},
+                    "playlistName": {"$last": "$name"},
+                    "rating": {"$first": "$r.rating"},
+                    "comment": {"$first": "$r.comment"}
+                }
+            },            
+          ];
+
+          const cursor = db.collection('playlist').aggregate(pipeline, (err, cursor) => {
+            if (err) {
+                handleError(res, err.message, "Failed to get post");
+              } else {
+                cursor.toArray((error, documents) => {
+                  if (error) { return handleError(res, error.message, "Failed to get post"); }
+                  console.log(documents)
+                  res.status(200).send(documents);
+                });
+              }
+          });
+    }
+});
+
+
 app.put('/review', (req, res) => {
     const { userId } = req.query;
     const { playlistId } = req.query
@@ -505,6 +556,11 @@ function migrate() {
         if (err) {
             console.log(err);
         }
+        db.collection("playlist").createIndex({creationDate : -1}, function(err, res) {
+            console.log(res);
+            // callback(res);
+        });
+        // db.collection("playlist").hideIndex("creationDate_-1");
         db.collection("playlist").insertMany(results);
     });
 
@@ -526,6 +582,10 @@ function migrate() {
         if (err) {
             console.log(err);
         }
+        db.collection("song").createIndex({"$**": "text"}, function(err, res) {
+            console.log(res);
+            // callback(res);
+        });
         db.collection("song").insertMany(results);
     });
 
