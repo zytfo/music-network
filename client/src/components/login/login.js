@@ -27,11 +27,11 @@ function Login(props) {
                     username: username,
                     password: password
                 }
-            }).then( resp => {
+            }).then(resp => {
                 setError(null);
                 auth.login(JSON.stringify(resp.data));
                 props.history.push("/");
-            }).catch( err => {
+            }).catch(err => {
                 setError(err.response.data.error);
             })
         }
@@ -79,7 +79,6 @@ function Login(props) {
                     <span className={"error-text"}>{error}</span>
                 </div>
             }
-
         </div>
     )
 }

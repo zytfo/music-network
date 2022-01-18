@@ -4,29 +4,38 @@ import './register.css';
 import {withRouter} from 'react-router-dom';
 import TextField from "@material-ui/core/TextField/TextField";
 import Button from "@material-ui/core/Button";
-import auth from "../../services/auth";
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControl from "@material-ui/core/FormControl";
+import FormControlLabel from "@material-ui/core/FormControlLabel";
 
 function Register(props) {
     const [username, setUsername] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isMusician, setIsMusician] = useState(true);
     const [error, setError] = useState(null);
 
     function register() {
         if (username !== "" && password !== "" && email !== "") {
+            let musFlag;
+            if (isMusician) {
+                musFlag = 1;
+            } else {
+                musFlag = 0;
+            }
             const data = {
                 username: username,
                 password: password,
-                isMusician: 1,
+                isMusician: musFlag,
                 email: email,
             };
-            axios.post("http://localhost:8000/register", data
-            ).then( resp => {
-                setError(null);
-                props.history.push("/login");
-            }).catch( err => {
-                setError(err.response.data.error);
-            })
+            axios.post("http://localhost:8000/register", data.then(resp => {
+                    setError(null);
+                    props.history.push("/login");
+                }).catch( err => {
+                    setError(err.response.data.error);
+                })
+            )
         }
     }
 
@@ -63,6 +72,20 @@ function Register(props) {
                         value={password}
                         onChange={(event) => setPassword(event.target.value)}
                     />
+                </div>
+                <div className={"text-field"}>
+                    <FormControl>
+                        <FormControlLabel
+                            control={
+                                <Checkbox 
+                                    checked={isMusician} 
+                                    onChange={(event) => setIsMusician(event.target.checked)}
+                                    color="primary"
+                                />
+                            }
+                        label="Are you musician?"
+                        />
+                    </FormControl>
                 </div>
                 <div className={"text-field"}>
                     <Button

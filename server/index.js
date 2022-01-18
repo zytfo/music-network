@@ -128,7 +128,7 @@ app.get('/login', (req, res) => {
 
 app.get('/songs', (req, res) => {
     if (!flag) {
-        pool.query(`SELECT * FROM ${'song'}`, (err, results) => {
+        pool.query(`SELECT song.id, song.name, song.duration, song.genre, song.album, song.releaseDate, user.username FROM ${'song'} JOIN ${'user'} ON ${'song.userId = user.id'}`, (err, results) => {
             if (err) {
                 console.log(err);
                 return res.status(500).send({ error: "Something went wrong"});

@@ -10,11 +10,6 @@ import axios from "axios";
 
 function MyAppBar(props) {
 
-    function logOut() {
-        auth.logout();
-        props.history.push('/login');
-    }
-
     function migrate() {
         axios.get('http://localhost:8000/migrate', {
         }).then((response) => {
@@ -24,13 +19,18 @@ function MyAppBar(props) {
         });
     }
 
+    function logOut() {
+        auth.logout();
+        props.history.push('/login');
+    }
+
     return (
-        <AppBar position="static" color={"default"}>
+        <AppBar position="static" color={"primary"}>
             <Toolbar>
                 <div className={"title"}>
-                    Song Share Network
+                    MUSIC NETWORK
                 </div>
-                <Button color="inherit" onClick={migrate}>MIGRATE TO MONGO</Button>
+                <Button color="inherit" onClick={migrate}>MIGRATE</Button>
                 <Button color="inherit" onClick={() => props.history.push('/')}>Home</Button>
                 {auth.isAuthenticated() && <Button color="inherit" onClick={() => props.history.push('/report')}>Playlists</Button>}
                 {auth.isAuthenticated() ?

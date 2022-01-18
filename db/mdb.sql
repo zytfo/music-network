@@ -84,7 +84,7 @@ INSERT INTO `review` (`id`, `userId`, `playlistId`, `rating`, `comment`) VALUES
 --
 
 CREATE TABLE `role` (
-  `id` int(11) NOT NULL,
+  `id` int(11) NOT NULL,f
   `userId` int(11) NOT NULL,
   `isAdmin` tinyint(1) NOT NULL,
   `isMusician` tinyint(1) NOT NULL

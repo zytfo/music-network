@@ -64,20 +64,20 @@ services:
       - mysql
       - mongo
     command: npm start
-  client:
-    build: ./client
-    environment:
-      <<: *common-variables
-      NODE_PATH: src
-    expose:
-      - 3000
-    ports:
-      - 3000:3000
-    volumes:
-      - ./client/src:/app/src
-    links:
-      - server
-    stdin_open: true
-    command: npm start
+  # client:
+  #   build: ./client
+  #   environment:
+  #     <<: *common-variables
+  #     NODE_PATH: src
+  #   expose:
+  #     - 3000
+  #   ports:
+  #     - 3000:3000
+  #   volumes:
+  #     - ./client/src:/app/src
+  #   links:
+  #     - server
+  #   stdin_open: true
+  #   command: npm start
 volumes:
   dbdata:

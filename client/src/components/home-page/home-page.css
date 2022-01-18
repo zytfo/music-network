@@ -8,11 +8,11 @@
     text-align: center;
 }
 
-.game-container {
+.song-container {
     margin: 0 !important;
 }
 
-.game-card {
+.song-card {
     cursor: pointer;
     background-color: #ffffff;
     border-radius: 8px;
@@ -22,11 +22,11 @@
     transition: all 0.2s ease-out 0s;
 }
 
-.game-card:hover {
+.song-card:hover {
     box-shadow: 0 10px 35px -10px rgba(0,0,0,0.75);
 }
 
-.game-info {
+.song-info {
     margin: auto;
     width: 50%;
     border: 3px solid transparent;
