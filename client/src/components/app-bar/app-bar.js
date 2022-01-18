@@ -7,7 +7,6 @@ import {withRouter} from "react-router-dom";
 import auth from "../../services/auth";
 import axios from "axios";
 
-
 function MyAppBar(props) {
 
     function migrate() {
@@ -32,7 +31,8 @@ function MyAppBar(props) {
                 </div>
                 <Button color="inherit" onClick={migrate}>MIGRATE</Button>
                 <Button color="inherit" onClick={() => props.history.push('/')}>Home</Button>
-                {auth.isAuthenticated() && <Button color="inherit" onClick={() => props.history.push('/report')}>Playlists</Button>}
+                {auth.isAuthenticated() && <Button color="inherit" onClick={() => props.history.push('/playlist')}>Playlists</Button>}
+                {auth.isAuthenticated() && <Button color="inherit" onClick={() => props.history.push('/review')}>Reviews</Button>}
                 {auth.isAuthenticated() ?
                     <Button color="inherit" onClick={logOut}>Log Out</Button> :
                     <Button color="inherit" onClick={() => props.history.push('/login')}>Log In</Button>

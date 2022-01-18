@@ -23,25 +23,16 @@ function HomePage(props) {
     const [songs, setSongs] = useState(null);
     const [songsFullList, setSongsFullList] = useState(null);
     const [isLoading, setLoading] = useState(true);
-    const [data, setData] = useState([]);
-    const [limit, setLimit] = useState(10);
     const [songName, setSongName] = useState('');
     const [duration, setDuration] = useState('');
     const [genre, setGenre] = useState('');
     const [album, setAlbum] = useState('');
-    const [releaseDate, setReleaseDate] = useState(null);
     const [dialog, setDialog] = useState(false);
     const [isMusician, setIsMusician] = useState(false);
     const [userId, setUserId] = useState(null);
 
     useEffect(() => {
-        axios.get('http://localhost:8000/songs', {}).then((response) => {
-            setSongs(response.data);
-            setSongsFullList(response.data);
-            setLoading(false);
-        }).catch(error => {
-            console.warn(error);
-        });
+        getSongs();
         let userMus = JSON.parse(auth.token)[0]["isMusician"];
         setUserId(JSON.parse(auth.token)[0]["id"]);
         if (userMus == 1) {
@@ -50,6 +41,16 @@ function HomePage(props) {
             setIsMusician(false);
         }
     }, []);
+
+    function getSongs() {
+        axios.get('http://localhost:8000/songs', {}).then((response) => {
+            setSongs(response.data);
+            setSongsFullList(response.data);
+            setLoading(false);
+        }).catch(error => {
+            console.warn(error);
+        });
+    }
 
     function goToSongDetails(id) {
         props.history.push(`/song/${id}`);
@@ -113,7 +114,7 @@ function HomePage(props) {
             };
             axios.post("http://localhost:8000/song", data).then(resp => {
                 closeDialog();
-                // getReport();
+                getSongs();
             }).catch(err => {
                 console.warn(err.response.data);
             })
@@ -130,8 +131,6 @@ function HomePage(props) {
             <div className={"search-bar"}>
                 <Input placeholder="Search" onChange={(e) => findSongs(e)}/>
             </div>
-
-            
 
             {/* {songs ?
                 <Grid className={"song-container"} container spacing={8}>

@@ -15,10 +15,6 @@ const pool = mysql.createPool({
     user: process.env.MYSQL_USER,
     password: process.env.MYSQL_PASSWORD,
     database: process.env.MYSQL_DATABASE,
-    // host: "localhost",
-    // user: "admin",
-    // password: "admin",
-    // database: "mdb",
 });
 
 const {
@@ -53,10 +49,6 @@ app.use(cors());
 app.listen(process.env.REACT_APP_SERVER_PORT, () => {
     console.log(`App server now listening on port ${process.env.REACT_APP_SERVER_PORT}`);
 });
-
-// app.listen(8000, () => {
-//     console.log(`App server now listening on port ${process.env.REACT_APP_SERVER_PORT}`);
-// });
 
 app.post('/register', (req, res) => {
     const { username } = req.body;
@@ -256,7 +248,21 @@ app.get('/playlists', (req, res) => {
     }
 });
 
-
+app.get('/user', (req, res) => {
+    const { userId } = req.query; 
+    if (!flag) {
+        pool.query(`SELECT username FROM ${'user'} WHERE user.id = '${userId}'`, (err, results) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send({ error: "Something went wrong"}); 
+            } else {
+                if (results.length > 0) {
+                    return res.send(results);
+                } else return res.status(404).send({ error: 'No songs found'});
+            }
+        });
+    }
+});
  
 
 app.get('/playlist', (req, res) => {
@@ -467,7 +473,7 @@ app.put('/review', (req, res) => {
 
 app.get('/reviews', (req, res) => {
     if (!flag) {
-        pool.query(`SELECT * FROM ${'review'}`, (err, results) => {
+        pool.query(`SELECT review.id, review.userId, review.playlistId, review.rating, review.comment, user.username, playlist.name FROM ${'review'} JOIN user ON user.id = review.userId JOIN playlist ON review.playlistId = playlist.id`, (err, results) => {
             if (err) {
                 console.log(err);
                 return res.status(500).send({ error: "Something went wrong"});

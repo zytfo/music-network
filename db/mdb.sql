@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: mysql
--- Generation Time: Jan 13, 2022 at 09:01 PM
+-- Generation Time: Jan 18, 2022 at 03:36 PM
 -- Server version: 5.7.36
 -- PHP Version: 7.4.20
 
@@ -43,7 +43,9 @@ INSERT INTO `playlist` (`id`, `userId`, `name`, `creationDate`) VALUES
 (2, 1, 'Everyday', '2021-11-05'),
 (3, 4, 'My playlist', '2020-07-10'),
 (4, 5, 'untitled', '2021-01-20'),
-(5, 5, 'twenty one pilots playlist', '2022-01-01');
+(5, 5, 'twenty one pilots playlist', '2022-01-01'),
+(6, 3, 'asd', '2022-01-18'),
+(7, 3, '123', '2022-01-18');
 
 -- --------------------------------------------------------
 
@@ -56,6 +58,26 @@ CREATE TABLE `playlistSongs` (
   `songId` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `playlistSongs`
+--
+
+INSERT INTO `playlistSongs` (`playlistId`, `songId`) VALUES
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 5),
+(2, 6),
+(3, 6),
+(3, 7),
+(3, 8),
+(4, 1),
+(4, 2),
+(4, 3),
+(4, 5),
+(5, 1),
+(6, 10);
+
 -- --------------------------------------------------------
 
 --
@@ -66,16 +88,20 @@ CREATE TABLE `review` (
   `id` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `playlistId` int(11) NOT NULL,
-  `rating` int(5) NOT NULL,
+  `rating` int(100) NOT NULL,
   `comment` mediumtext NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
+--
+-- Dumping data for table `review`
+--
+
 INSERT INTO `review` (`id`, `userId`, `playlistId`, `rating`, `comment`) VALUES
-(1, 1, 1, 5, 'dolo'),
-(2, 1, 2, 5, 'ipsum'),
-(3, 4, 3, 4, 'lorem'),
-(4, 5, 4, 3, 'some'),
-(5, 5, 5, 2, 'norm');
+(1, 1, 1, 80, 'dolo'),
+(2, 1, 2, 70, 'ipsum'),
+(3, 4, 3, 10, 'lorem'),
+(4, 5, 4, 23, 'some'),
+(5, 5, 5, 49, 'norm');
 
 -- --------------------------------------------------------
 
@@ -84,7 +110,7 @@ INSERT INTO `review` (`id`, `userId`, `playlistId`, `rating`, `comment`) VALUES
 --
 
 CREATE TABLE `role` (
-  `id` int(11) NOT NULL,f
+  `id` int(11) NOT NULL,
   `userId` int(11) NOT NULL,
   `isAdmin` tinyint(1) NOT NULL,
   `isMusician` tinyint(1) NOT NULL
@@ -139,7 +165,9 @@ INSERT INTO `song` (`id`, `userId`, `name`, `duration`, `genre`, `album`, `relea
 (13, 2, 'The Outside', 216, 'rock', 'Scaled and Icy', '2021-05-21'),
 (14, 2, 'Saturday', 172, 'rock', 'Scaled and Icy', '2021-05-21'),
 (15, 6, 'besides you', 182, 'electronic', 'Colt', '2022-12-07'),
-(16, 7, 'CLOVER', 168, 'down-tempo', 'CLOVER', '2020-06-01');
+(16, 7, 'CLOVER', 168, 'down-tempo', 'CLOVER', '2020-06-01'),
+(17, 3, '1', 1, '1', '1', '2022-01-18'),
+(18, 3, '1', 2, '3', '4', '2022-01-18');
 
 -- --------------------------------------------------------
 
@@ -210,13 +238,13 @@ ALTER TABLE `user`
 -- AUTO_INCREMENT for table `playlist`
 --
 ALTER TABLE `playlist`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `review`
 --
 ALTER TABLE `review`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `role`
@@ -228,7 +256,7 @@ ALTER TABLE `role`
 -- AUTO_INCREMENT for table `song`
 --
 ALTER TABLE `song`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `user`

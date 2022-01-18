@@ -1,5 +1,6 @@
 import React, {useState, useEffect} from "react";
-import "./details.css"
+import "./review.css"
+import {withRouter} from 'react-router-dom';
 import axios from "axios";
 import auth from "../../services/auth";
 import CircularProgress from "@material-ui/core/CircularProgress/CircularProgress";
@@ -13,90 +14,69 @@ import DialogActions from "@material-ui/core/DialogActions";
 import TextField from "@material-ui/core/TextField";
 import Slider from "@material-ui/core/Slider";
 import { ThemeProvider } from "@material-ui/core";
-import {createMuiTheme} from "@material-ui/core";
+import {createTheme} from "@material-ui/core";
 
-export default function GameDetails(props) {
-    const [gameDetails, setGameDetails] = useState(null);
-    const [reviews, setReviews] = useState(null);
+function Review(props) {
+    const [playlists, setPlaylists] = useState([]);
+    const [reviews, setReviews] = useState([]);
+    const [review, setReview] = useState(null);
     const [dialog, setDialog] = useState(false);
-    const [rating, setRating] = useState(75);
+    const [isLoading, setLoading] = useState(true);
+    const [rating, setRating] = useState(0);
     const [text, setText] = useState('');
-
+    const [playlistIdReview, setPlaylistIdReview] = useState("");
+    const [userId, setUserId] = useState(null);
+    const [isMusician, setIsMusician] = useState(false);
     const [hasReview, setHasReview] = useState(false);
+    const [userName, setUsername] = useState(false);
 
     useEffect(() => {
-        const playlistId = props.match.params.id;
-        getReviews(playlistId);
-    },[]);
+        getPlaylist();
+        getReviews();
+        setUserId(JSON.parse(auth.token)[0]["id"]);
+        let userMus = JSON.parse(auth.token)[0]["isMusician"];
+        if (userMus == 1) {
+            setIsMusician(true);
+        } else {
+            setIsMusician(false);
+        }
+    }, []);
 
-    function getReviews(playlistId) {
-        axios.get("http://localhost:8000/review", {
-            params: {
-                playlistId: playlistId
-            }
-        }).then( resp => {
-            console.log(resp.data);
-            const rvws = resp.data;
-            setReviews(rvws);
-            const user = JSON.parse(localStorage.getItem('user'));
-            console.log(rvws)
-            for (let i = 0; i < rvws.length; i++) {
-                if (rvws[i].userId === user[0].id) {
-                    console.log(rvws)
-                    setHasReview(true);
-                    setRating(rvws[i].rating);
-                    setText(rvws[i].comment);
-                }
-            }
-        }).catch( err => {
-            console.log(err);
-        })
+    function getPlaylist() {
+        axios.get('http://localhost:8000/playlists', {}).then((response) => {
+            console.log(response.data);
+            setPlaylists(response.data);
+            setLoading(false);
+        }).catch(error => {
+            console.warn(error);
+        }).finally();
+    }
+
+    function getReviews() {
+        axios.get('http://localhost:8000/reviews', {}).then((response) => {
+            console.log(response.data);
+            setReviews(response.data);
+            setLoading(false);
+        }).catch(error => {
+            console.warn(error);
+        });
     }
 
     function publishReview() {
         if (text !== '') {
-            const user = JSON.parse(localStorage.getItem('user'));
             const data = {
-                playlistId: props.match.params.id,
-                userId: user[0].id,
+                playlistId: playlistIdReview,
+                userId: userId,
                 rating: rating,
                 comment: text
             };
             axios.post("http://localhost:8000/review", data).then(resp => {
                 closeDialog();
-                getReviews(data.playlistId);
+                getReviews();
             }).catch(err => {
                 console.warn(err.response.data);
             })
         }
-    }
-
-    function modifyReview() {
-        if (text !== '') {
-            const user = JSON.parse(localStorage.getItem('user'));
-            const data = {
-                playlistId: props.match.params.id,
-                userId: user[0].id,
-                rating: rating,
-                comment: text
-            };
-            axios.put("http://localhost:8000/review", data, {
-                params: {
-                    userId: user[0].id,
-                    playlistId: props.match.params.id
-                }
-            }).then(resp => {
-                closeDialog();
-                getReviews(data.playlistId);
-            }).catch(err => {
-                console.warn(err.response.data);
-            })
-        }
-    }
-
-    function beautifyDate(date) {
-        const temp = new Date(date);
-        return temp.toLocaleDateString();
     }
 
     function openDialog() {
@@ -107,16 +87,7 @@ export default function GameDetails(props) {
         setDialog(false);
     }
 
-    function gameWasReleased() {
-        const currentDate = new Date();
-        if (gameDetails) {
-            const gameDate = new Date(gameDetails.releaseDate);
-            return gameDate <= currentDate;
-        }
-        return true;
-    }
-
-    const AmountSlider = createMuiTheme({
+    const AmountSlider = createTheme({
         overrides: {
             MuiSlider: {
                 root: {
@@ -135,7 +106,6 @@ export default function GameDetails(props) {
                     },
                 },
                 active: {},
-
                 track: {
                     height: 8,
                     borderRadius: 4,
@@ -148,11 +118,15 @@ export default function GameDetails(props) {
         }
     });
 
+    if (isLoading) {
+        return <div className="App">Loading...</div>;
+    }
+
     return (
-        <div className={"details-container"}>
+        <div className={"rev-container"}>
             <div className={"review-cont"}>
-                <span className={"review-header"}>Reviews</span>
-                { auth.isAuthenticated() && gameWasReleased() &&
+                <h2>Reviews</h2>
+                {auth.isAuthenticated() &&
                     <Button
                         style={{
                             margin: '24px 0',
@@ -167,27 +141,26 @@ export default function GameDetails(props) {
                         {hasReview ? "Modify" : "Write"} Review
                     </Button>
                 }
-                {
-                    reviews ?
+                {reviews ?
                     <div>
                         { reviews.length === 0 && <div className={"no-review-header"}> No reviews found. Wanna add one?</div>}
                         <Grid container spacing={2}>
                             {reviews.map((review, index)=> (
                                 <Grid key={index} container item spacing={0} xs={12} sm={12} md={6}>
                                     <div className={"review-item-block"}>
+                                        <h2>{review.name}</h2>
                                         <div className={"review-item-title"}>
-                                            <span className={"review-item-username"}>{review.username}<br/>
-                                            </span>
-                                            <div
-                                                className={
-                                                    `review-item-rating ${review.rating < 50 ? 'bad-rating' : review.rating <= 70 ? 'av-rating' : 'good-rating'}`
-                                                }
+                                            <div className={
+                                                    `review-item-rating ${review.rating < 20 ? 'bad-rating' : review.rating <= 70 ? 'av-rating' : 'good-rating'}`}
                                             >
                                                 {review.rating}
                                             </div>
                                         </div>
                                         <div className={"review-item-text"}>
                                             {review.comment}
+                                        </div>
+                                        <div className={"review-item-user"}>
+                                            author: {review.username}
                                         </div>
                                     </div>
                                 </Grid>
@@ -204,9 +177,20 @@ export default function GameDetails(props) {
                             width: '500px',
                         }}
                     >
-                        New Review
+                        Leave a Review
                     </DialogTitle>
                     <DialogContent dividers>
+                        <div>
+                            <TextField
+                                value={playlistIdReview}
+                                onChange={(e)=>setPlaylistIdReview(e.target.value)}
+                                label="Playlist ID"
+                                multiline
+                                rows={1}
+                                variant="outlined"
+                                fullWidth
+                            />
+                        </div>
                         <div className={"dialog-slider"}>
                             <Typography>
                                 Rating - <span style={{color: rating < 50 ? '#e2553e' : rating <=70 ? '#e2c776' : '#52af77'}}>{rating}</span>
@@ -235,14 +219,9 @@ export default function GameDetails(props) {
                         </div>
                     </DialogContent>
                     <DialogActions>
-                        { !hasReview ?
-                            <Button autoFocus onClick={publishReview} color="primary" variant="outlined">
-                                Publish Review
-                            </Button> :
-                            < Button autoFocus onClick={modifyReview}color="primary" variant="outlined">
-                            Modify Review
-                            </Button>
-                        }
+                        <Button autoFocus onClick={publishReview} color="primary" variant="outlined">
+                            Publish Review
+                        </Button>
                         <Button autoFocus onClick={closeDialog} color="default">
                             Cancel
                         </Button>
@@ -252,3 +231,5 @@ export default function GameDetails(props) {
         </div>
     )
 }
+
+export default withRouter(Review);
