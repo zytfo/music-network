@@ -33,8 +33,8 @@ function HomePage(props) {
 
     useEffect(() => {
         getSongs();
-        let userMus = JSON.parse(auth.token)[0]["isMusician"];
-        setUserId(JSON.parse(auth.token)[0]["id"]);
+        let userMus = 1;
+        setUserId(0);
         if (userMus == 1) {
             setIsMusician(true);
         } else {
